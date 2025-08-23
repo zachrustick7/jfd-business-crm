@@ -72,8 +72,8 @@ const MessageHistoryPage: React.FC = () => {
     const Icon = config.icon;
 
     return (
-      <span className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${config.bg} ${config.color}`}>
-        <Icon className="w-3 h-3 mr-1" />
+      <span className={`status-pill ${config.bg} ${config.color}`}>
+        <Icon className="w-3 h-3 icon" />
         {config.label}
       </span>
     );
@@ -191,7 +191,7 @@ const MessageHistoryPage: React.FC = () => {
               <select
                 value={typeFilter}
                 onChange={(e) => setTypeFilter(e.target.value as any)}
-                className="px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="form-select"
               >
                 <option value="all">All Types</option>
                 <option value="email">Email</option>
@@ -200,7 +200,7 @@ const MessageHistoryPage: React.FC = () => {
               <select
                 value={statusFilter}
                 onChange={(e) => setStatusFilter(e.target.value as any)}
-                className="px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="form-select"
               >
                 <option value="all">All Status</option>
                 <option value="pending">Pending</option>
@@ -272,8 +272,9 @@ const MessageHistoryPage: React.FC = () => {
                     </div>
 
                     {message.errorMessage && (
-                      <div className="text-xs text-red-600 bg-red-50 p-2 rounded">
-                        <strong>Error:</strong> {message.errorMessage}
+                      <div className="status-pill-lg bg-red-50 text-red-700 border border-red-200">
+                        <AlertCircle className="h-3 w-3 icon" />
+                        <span><strong>Error:</strong> {message.errorMessage}</span>
                       </div>
                     )}
                   </div>

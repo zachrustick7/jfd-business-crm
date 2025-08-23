@@ -69,8 +69,8 @@ const DashboardPage: React.FC = () => {
     const colorClass = isPositive ? 'text-green-600 bg-green-50' : 'text-red-600 bg-red-50';
     
     return (
-      <div className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${colorClass}`}>
-        <Icon className="h-3 w-3 mr-1" />
+      <div className={`status-pill ${colorClass}`}>
+        <Icon className="h-3 w-3 icon" />
         {isPositive ? '+' : ''}{growth}%
       </div>
     );
@@ -169,7 +169,7 @@ const DashboardPage: React.FC = () => {
               <div className="w-12 h-12 bg-orange-100 rounded-lg flex items-center justify-center">
                 <Target className="h-6 w-6 text-orange-600" />
               </div>
-              <div className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium text-blue-600 bg-blue-50">
+              <div className="status-pill text-blue-600 bg-blue-50">
                 stable
               </div>
             </div>

@@ -372,11 +372,11 @@ const MessagingPage: React.FC = () => {
                         <div className="flex-1 min-w-0">
                           <div className="flex items-center space-x-3 mb-2">
                             <h3 className="text-lg font-semibold text-gray-900">{campaign.name}</h3>
-                            <span className={`px-2 py-1 text-xs rounded-full flex items-center space-x-1 ${statusDisplay.bg} ${statusDisplay.color}`}>
-                              {statusDisplay.icon}
+                            <span className={`status-pill ${statusDisplay.bg} ${statusDisplay.color}`}>
+                              <span className="icon">{statusDisplay.icon}</span>
                               <span className="capitalize">{campaign.status}</span>
                             </span>
-                            <span className={`px-2 py-1 text-xs rounded-full ${
+                            <span className={`status-pill ${
                               campaign.type === 'email' 
                                 ? 'bg-blue-100 text-blue-800' 
                                 : 'bg-purple-100 text-purple-800'
@@ -495,7 +495,7 @@ const MessagingPage: React.FC = () => {
                       required
                       value={formData.templateId}
                       onChange={(e) => handleTemplateChange(e.target.value)}
-                      className="w-full border border-gray-300 rounded-md px-3 py-2"
+                      className="form-select w-full"
                     >
                       <option value="">Select a template</option>
                       {templates.map(template => (
