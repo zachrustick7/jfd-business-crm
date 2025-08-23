@@ -1,0 +1,11 @@
+firstName,lastName,email,phone,company,notes,tags
+John,Doe,john.doe@email.com,555-123-4567,Acme Corporation,Important VIP client,vip,priority
+Jane,Smith,jane.smith@company.com,555-234-5678,Smith Consulting,Needs tax planning consultation,tax,consultation
+Michael,Johnson,m.johnson@business.net,555-345-6789,Johnson & Associates,Quarterly bookkeeping client,bookkeeping,quarterly
+Sarah,Williams,sarah.w@startup.io,555-456-7890,TechStart Inc,New business startup needs guidance,startup,new
+David,Brown,dbrown@enterprise.com,555-567-8901,Enterprise Solutions,Large corporate client,corporate,enterprise
+Lisa,Davis,lisa.davis@nonprofit.org,555-678-9012,Community Foundation,Non-profit tax exemption help,nonprofit,tax
+Robert,Miller,r.miller@retail.com,555-789-0123,Miller's Retail,Small business tax preparation,retail,small-business
+Jennifer,Wilson,jennifer@services.biz,555-890-1234,Wilson Services LLC,Monthly financial review,monthly,financial
+Chris,Taylor,chris.taylor@tech.com,555-901-2345,Taylor Tech Solutions,IT business consulting,tech,consulting
+Amanda,Anderson,amanda@marketing.pro,555-012-3456,Anderson Marketing,Marketing agency bookkeeping,marketing,agency 

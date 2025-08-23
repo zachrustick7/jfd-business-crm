@@ -1,0 +1,20 @@
+{
+  "name": "jfd-crm-platform",
+  "version": "1.0.0",
+  "description": "Customer Relations Management platform with bulk messaging capabilities",
+  "main": "index.js",
+  "scripts": {
+    "dev": "concurrently \"npm run server:dev\" \"npm run client:dev\"",
+    "server:dev": "cd server && npm run dev",
+    "client:dev": "cd client && npm start",
+    "build": "cd client && npm run build",
+    "start": "cd server && npm start",
+    "setup": "npm install && cd server && npm install && cd ../client && npm install"
+  },
+  "keywords": ["crm", "messaging", "email", "sms", "contacts"],
+  "author": "JFD Business Consulting",
+  "license": "MIT",
+  "devDependencies": {
+    "concurrently": "^8.2.2"
+  }
+} 
