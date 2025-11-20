@@ -46,17 +46,31 @@ const initializeDatabase = async () => {
         phone VARCHAR(20),
         company VARCHAR(255),
         position VARCHAR(255),
+        address VARCHAR(255),
+        city VARCHAR(100),
+        state VARCHAR(2), -- Two-letter state code (e.g., VA, NM)
+        zip_code VARCHAR(10),
+        filing_status VARCHAR(50), -- Tax filing status
+        status VARCHAR(50) DEFAULT 'active', -- Lead, Active, Inactive
         notes TEXT,
         tags TEXT[], -- Array of tags for categorization
+        last_contact_date TIMESTAMP,
         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
         updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
       )
     `);
 
-    // Add position column if it doesn't exist (for existing databases)
+    // Add new columns if they don't exist (for existing databases)
     await pool.query(`
       ALTER TABLE contacts 
-      ADD COLUMN IF NOT EXISTS position VARCHAR(255)
+      ADD COLUMN IF NOT EXISTS position VARCHAR(255),
+      ADD COLUMN IF NOT EXISTS address VARCHAR(255),
+      ADD COLUMN IF NOT EXISTS city VARCHAR(100),
+      ADD COLUMN IF NOT EXISTS state VARCHAR(2),
+      ADD COLUMN IF NOT EXISTS zip_code VARCHAR(10),
+      ADD COLUMN IF NOT EXISTS filing_status VARCHAR(50),
+      ADD COLUMN IF NOT EXISTS status VARCHAR(50) DEFAULT 'active',
+      ADD COLUMN IF NOT EXISTS last_contact_date TIMESTAMP
     `);
 
     // Message templates table

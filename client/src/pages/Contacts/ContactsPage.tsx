@@ -3,9 +3,10 @@ import { Card, CardHeader, CardTitle, CardContent } from '../../components/ui/ca
 import { Button } from '../../components/ui/button';
 import { Input } from '../../components/ui/input';
 import { Contact } from '../../types';
+import { US_STATES, FILING_STATUSES, CONTACT_STATUSES } from '../../lib/constants';
 
 import axios from 'axios';
-import { Plus, Search, Upload, Edit2, Trash2, Mail, Phone, Building2, User } from 'lucide-react';
+import { Plus, Search, Upload, Edit2, Trash2, Mail, Phone, Building2, User, MapPin, Tag as TagIcon } from 'lucide-react';
 
 interface ContactFormData {
   first_name: string;
@@ -14,6 +15,12 @@ interface ContactFormData {
   phone: string;
   company: string;
   position: string;
+  address: string;
+  city: string;
+  state: string;
+  zip_code: string;
+  filing_status: string;
+  status: string;
   tags: string;
   notes: string;
 }
@@ -31,6 +38,12 @@ const ContactsPage: React.FC = () => {
     phone: '',
     company: '',
     position: '',
+    address: '',
+    city: '',
+    state: '',
+    zip_code: '',
+    filing_status: '',
+    status: 'active',
     tags: '',
     notes: ''
   });
@@ -78,6 +91,12 @@ const ContactsPage: React.FC = () => {
         phone: formData.phone,
         company: formData.company,
         position: formData.position,
+        address: formData.address,
+        city: formData.city,
+        state: formData.state,
+        zipCode: formData.zip_code,
+        filingStatus: formData.filing_status,
+        status: formData.status || 'active',
         notes: formData.notes,
         tags: formData.tags ? formData.tags.split(',').map(tag => tag.trim()) : []
       };
@@ -125,6 +144,12 @@ const ContactsPage: React.FC = () => {
       phone: contact.phone || '',
       company: contact.company || '',
       position: contact.position || '',
+      address: contact.address || '',
+      city: contact.city || '',
+      state: contact.state || '',
+      zip_code: contact.zipCode || '',
+      filing_status: contact.filingStatus || '',
+      status: contact.status || 'active',
       tags: Array.isArray(contact.tags) ? contact.tags.join(', ') : '',
       notes: contact.notes || ''
     });
@@ -142,6 +167,12 @@ const ContactsPage: React.FC = () => {
       phone: '',
       company: '',
       position: '',
+      address: '',
+      city: '',
+      state: '',
+      zip_code: '',
+      filing_status: '',
+      status: 'active',
       tags: '',
       notes: ''
     });
@@ -321,6 +352,36 @@ const ContactsPage: React.FC = () => {
                               <span className="text-sm text-gray-500">{contact.position}</span>
                             </div>
                           )}
+                          
+                          {(contact.city || contact.state) && (
+                            <div className="flex items-center space-x-3 text-gray-600">
+                              <MapPin className="h-4 w-4 text-gray-400 flex-shrink-0" />
+                              <span className="text-sm">
+                                {contact.city}{contact.city && contact.state && ', '}{contact.state}
+                              </span>
+                            </div>
+                          )}
+                          
+                          {contact.filingStatus && (
+                            <div className="flex items-center space-x-3">
+                              <span className="status-pill-sm bg-purple-100 text-purple-700">
+                                {contact.filingStatus}
+                              </span>
+                            </div>
+                          )}
+                          
+                          {contact.tags && contact.tags.length > 0 && (
+                            <div className="flex items-start space-x-2 mt-2">
+                              <TagIcon className="h-4 w-4 text-gray-400 flex-shrink-0 mt-0.5" />
+                              <div className="flex flex-wrap gap-1">
+                                {contact.tags.map((tag, idx) => (
+                                  <span key={idx} className="status-pill-sm bg-blue-50 text-blue-700">
+                                    {tag}
+                                  </span>
+                                ))}
+                              </div>
+                            </div>
+                          )}
                         </div>
                       </div>
                     </div>
@@ -364,7 +425,7 @@ const ContactsPage: React.FC = () => {
             </CardHeader>
             <CardContent style={{ padding: '8px 24px 16px 24px' }}>
               <form onSubmit={handleSubmit}>
-                {/* Compact two-column layout */}
+                {/* Basic Information */}
                 <div className="grid grid-cols-2 gap-3" style={{ marginBottom: '12px' }}>
                   <div>
                     <label className="block text-xs font-medium text-gray-700" style={{ marginBottom: '4px' }}>
@@ -410,6 +471,64 @@ const ContactsPage: React.FC = () => {
                       onChange={(e) => setFormData({...formData, phone: e.target.value})}
                     />
                   </div>
+                </div>
+
+                {/* Address Information */}
+                <div className="grid grid-cols-2 gap-3" style={{ marginBottom: '12px' }}>
+                  <div className="col-span-2">
+                    <label className="block text-xs font-medium text-gray-700" style={{ marginBottom: '4px' }}>
+                      Street Address
+                    </label>
+                    <Input
+                      style={{ height: '36px', fontSize: '14px' }}
+                      value={formData.address}
+                      onChange={(e) => setFormData({...formData, address: e.target.value})}
+                      placeholder="123 Main St"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-xs font-medium text-gray-700" style={{ marginBottom: '4px' }}>
+                      City
+                    </label>
+                    <Input
+                      style={{ height: '36px', fontSize: '14px' }}
+                      value={formData.city}
+                      onChange={(e) => setFormData({...formData, city: e.target.value})}
+                    />
+                  </div>
+                  <div className="grid grid-cols-2 gap-3">
+                    <div>
+                      <label className="block text-xs font-medium text-gray-700" style={{ marginBottom: '4px' }}>
+                        State
+                      </label>
+                      <select
+                        className="form-select w-full"
+                        style={{ height: '36px', fontSize: '14px' }}
+                        value={formData.state}
+                        onChange={(e) => setFormData({...formData, state: e.target.value})}
+                      >
+                        <option value="">Select...</option>
+                        {US_STATES.map(state => (
+                          <option key={state.code} value={state.code}>{state.code}</option>
+                        ))}
+                      </select>
+                    </div>
+                    <div>
+                      <label className="block text-xs font-medium text-gray-700" style={{ marginBottom: '4px' }}>
+                        ZIP Code
+                      </label>
+                      <Input
+                        style={{ height: '36px', fontSize: '14px' }}
+                        value={formData.zip_code}
+                        onChange={(e) => setFormData({...formData, zip_code: e.target.value})}
+                        maxLength={10}
+                      />
+                    </div>
+                  </div>
+                </div>
+
+                {/* Business Information */}
+                <div className="grid grid-cols-2 gap-3" style={{ marginBottom: '12px' }}>
                   <div>
                     <label className="block text-xs font-medium text-gray-700" style={{ marginBottom: '4px' }}>
                       Company
@@ -431,8 +550,56 @@ const ContactsPage: React.FC = () => {
                     />
                   </div>
                 </div>
+
+                {/* Tax & Status Information */}
+                <div className="grid grid-cols-2 gap-3" style={{ marginBottom: '12px' }}>
+                  <div>
+                    <label className="block text-xs font-medium text-gray-700" style={{ marginBottom: '4px' }}>
+                      Filing Status
+                    </label>
+                    <select
+                      className="form-select w-full"
+                      style={{ height: '36px', fontSize: '14px' }}
+                      value={formData.filing_status}
+                      onChange={(e) => setFormData({...formData, filing_status: e.target.value})}
+                    >
+                      <option value="">Select...</option>
+                      {FILING_STATUSES.map(status => (
+                        <option key={status} value={status}>{status}</option>
+                      ))}
+                    </select>
+                  </div>
+                  <div>
+                    <label className="block text-xs font-medium text-gray-700" style={{ marginBottom: '4px' }}>
+                      Contact Status
+                    </label>
+                    <select
+                      className="form-select w-full"
+                      style={{ height: '36px', fontSize: '14px' }}
+                      value={formData.status}
+                      onChange={(e) => setFormData({...formData, status: e.target.value})}
+                    >
+                      {CONTACT_STATUSES.map(status => (
+                        <option key={status.value} value={status.value}>{status.label}</option>
+                      ))}
+                    </select>
+                  </div>
+                </div>
+
+                {/* Tags */}
+                <div style={{ marginBottom: '12px' }}>
+                  <label className="block text-xs font-medium text-gray-700" style={{ marginBottom: '4px' }}>
+                    Tags (comma-separated)
+                  </label>
+                  <Input
+                    style={{ height: '36px', fontSize: '14px' }}
+                    value={formData.tags}
+                    onChange={(e) => setFormData({...formData, tags: e.target.value})}
+                    placeholder="VIP, Customer, Lead"
+                  />
+                </div>
                 
-                {/* Compact notes field */}
+                {/* Notes */}
                 <div style={{ marginBottom: '12px' }}>
                   <label className="block text-xs font-medium text-gray-700" style={{ marginBottom: '4px' }}>
                     Notes
@@ -447,7 +614,7 @@ const ContactsPage: React.FC = () => {
                   />
                 </div>
                 
-                {/* Compact action buttons */}
+                {/* Action buttons */}
                 <div className="flex space-x-3 pt-2 border-t">
                   <Button type="submit" disabled={formLoading} className="flex-1" style={{ height: '36px', fontSize: '14px' }}>
                     {formLoading ? 'Saving...' : (editingContact ? 'Update' : 'Add Contact')}

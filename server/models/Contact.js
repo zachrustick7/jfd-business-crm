@@ -14,8 +14,15 @@ class Contact {
     this.phone = data.phone;
     this.company = data.company;
     this.position = data.position;
+    this.address = data.address;
+    this.city = data.city;
+    this.state = data.state;
+    this.zipCode = data.zip_code || data.zipCode;
+    this.filingStatus = data.filing_status || data.filingStatus;
+    this.status = data.status || 'active';
     this.notes = data.notes;
     this.tags = data.tags || [];
+    this.lastContactDate = data.last_contact_date || data.lastContactDate;
     this.createdAt = data.created_at || data.createdAt;
     this.updatedAt = data.updated_at || data.updatedAt;
   }
@@ -30,8 +37,15 @@ class Contact {
       phone: this.phone,
       company: this.company,
       position: this.position,
+      address: this.address,
+      city: this.city,
+      state: this.state,
+      zip_code: this.zipCode,
+      filing_status: this.filingStatus,
+      status: this.status,
       notes: this.notes,
-      tags: this.tags
+      tags: this.tags,
+      last_contact_date: this.lastContactDate
     };
   }
 
@@ -46,8 +60,15 @@ class Contact {
       phone: this.phone,
       company: this.company,
       position: this.position,
+      address: this.address,
+      city: this.city,
+      state: this.state,
+      zipCode: this.zipCode,
+      filingStatus: this.filingStatus,
+      status: this.status,
       notes: this.notes,
       tags: this.tags,
+      lastContactDate: this.lastContactDate,
       createdAt: this.createdAt,
       updatedAt: this.updatedAt
     };
@@ -60,21 +81,31 @@ class Contact {
 
   // Static methods for database operations
   static async create(contactData) {
-    const { userId, firstName, lastName, email, phone, company, position, notes, tags = [] } = contactData;
+    const { 
+      userId, firstName, lastName, email, phone, company, position, 
+      address, city, state, zipCode, filingStatus, status = 'active', 
+      notes, tags = [], lastContactDate 
+    } = contactData;
     
     const query = `
-      INSERT INTO contacts (user_id, first_name, last_name, email, phone, company, position, notes, tags)
-      VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)
-      RETURNING id, user_id, first_name, last_name, email, phone, company, position, notes, tags, created_at, updated_at
+      INSERT INTO contacts (
+        user_id, first_name, last_name, email, phone, company, position,
+        address, city, state, zip_code, filing_status, status, notes, tags, last_contact_date
+      )
+      VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16)
+      RETURNING *
     `;
     
-    const result = await pool.query(query, [userId, firstName, lastName, email, phone, company, position, notes, tags]);
+    const result = await pool.query(query, [
+      userId, firstName, lastName, email, phone, company, position,
+      address, city, state, zipCode, filingStatus, status, notes, tags, lastContactDate
+    ]);
     return new Contact(result.rows[0]);
   }
 
   static async findById(id, userId) {
     const query = `
-      SELECT id, user_id, first_name, last_name, email, phone, company, position, notes, tags, created_at, updated_at
+      SELECT *
       FROM contacts WHERE id = $1 AND user_id = $2
     `;
     
@@ -86,7 +117,7 @@ class Contact {
     const { search, limit = 100, offset = 0, orderBy = 'created_at', orderDirection = 'DESC' } = options;
     
     let query = `
-      SELECT id, user_id, first_name, last_name, email, phone, company, position, notes, tags, created_at, updated_at
+      SELECT *
       FROM contacts WHERE user_id = $1
     `;
     
@@ -98,7 +129,9 @@ class Contact {
         first_name ILIKE $${params.length + 1} OR 
         last_name ILIKE $${params.length + 1} OR 
         email ILIKE $${params.length + 1} OR 
-        company ILIKE $${params.length + 1}
+        company ILIKE $${params.length + 1} OR
+        city ILIKE $${params.length + 1} OR
+        state ILIKE $${params.length + 1}
       )`;
       params.push(`%${search}%`);
     }
@@ -111,17 +144,27 @@ class Contact {
   }
 
   static async update(id, userId, contactData) {
-    const { firstName, lastName, email, phone, company, position, notes, tags } = contactData;
+    const { 
+      firstName, lastName, email, phone, company, position,
+      address, city, state, zipCode, filingStatus, status,
+      notes, tags, lastContactDate
+    } = contactData;
     
     const query = `
       UPDATE contacts 
       SET first_name = $1, last_name = $2, email = $3, phone = $4, company = $5, 
-          position = $6, notes = $7, tags = $8, updated_at = CURRENT_TIMESTAMP
-      WHERE id = $9 AND user_id = $10
-      RETURNING id, user_id, first_name, last_name, email, phone, company, position, notes, tags, created_at, updated_at
+          position = $6, address = $7, city = $8, state = $9, zip_code = $10,
+          filing_status = $11, status = $12, notes = $13, tags = $14, 
+          last_contact_date = $15, updated_at = CURRENT_TIMESTAMP
+      WHERE id = $16 AND user_id = $17
+      RETURNING *
     `;
     
-    const result = await pool.query(query, [firstName, lastName, email, phone, company, position, notes, tags, id, userId]);
+    const result = await pool.query(query, [
+      firstName, lastName, email, phone, company, position,
+      address, city, state, zipCode, filingStatus, status,
+      notes, tags, lastContactDate, id, userId
+    ]);
     return result.rows[0] ? new Contact(result.rows[0]) : null;
   }
 
@@ -156,13 +199,24 @@ class Contact {
       
       for (const contactData of contactsData) {
         const query = `
-          INSERT INTO contacts (user_id, first_name, last_name, email, phone, company, position, notes, tags)
-          VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)
-          RETURNING id, user_id, first_name, last_name, email, phone, company, position, notes, tags, created_at, updated_at
+          INSERT INTO contacts (
+            user_id, first_name, last_name, email, phone, company, position,
+            address, city, state, zip_code, filing_status, status, notes, tags, last_contact_date
+          )
+          VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16)
+          RETURNING *
         `;
         
-        const { firstName, lastName, email, phone, company, position, notes, tags = [] } = contactData;
-        const result = await client.query(query, [userId, firstName, lastName, email, phone, company, position, notes, tags]);
+        const { 
+          firstName, lastName, email, phone, company, position,
+          address, city, state, zipCode, filingStatus, status = 'active',
+          notes, tags = [], lastContactDate
+        } = contactData;
+        
+        const result = await client.query(query, [
+          userId, firstName, lastName, email, phone, company, position,
+          address, city, state, zipCode, filingStatus, status, notes, tags, lastContactDate
+        ]);
         createdContacts.push(new Contact(result.rows[0]));
       }
       

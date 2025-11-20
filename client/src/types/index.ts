@@ -43,8 +43,15 @@ export interface Contact {
   phone?: string;
   company?: string;
   position?: string;
+  address?: string;
+  city?: string;
+  state?: string;
+  zipCode?: string;
+  filingStatus?: 'Single' | 'Married Filing Jointly' | 'Married Filing Separately' | 'Head of Household' | 'Qualifying Widow(er)';
+  status?: 'active' | 'lead' | 'inactive';
   notes?: string;
   tags: string[];
+  lastContactDate?: string;
   createdAt: string;
   updatedAt: string;
 }
@@ -56,8 +63,15 @@ export interface CreateContactRequest {
   phone?: string;
   company?: string;
   position?: string;
+  address?: string;
+  city?: string;
+  state?: string;
+  zipCode?: string;
+  filingStatus?: 'Single' | 'Married Filing Jointly' | 'Married Filing Separately' | 'Head of Household' | 'Qualifying Widow(er)';
+  status?: 'active' | 'lead' | 'inactive';
   notes?: string;
   tags?: string[];
+  lastContactDate?: string;
 }
 
 export interface UpdateContactRequest extends CreateContactRequest {}
@@ -207,7 +221,14 @@ export interface ContactFormData {
   phone: string;
   company: string;
   position: string;
+  address: string;
+  city: string;
+  state: string;
+  zip_code: string;
+  filing_status: string;
+  status: string;
   notes: string;
+  tags: string[];
 }
 
 export interface UserFormData {
