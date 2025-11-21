@@ -3,7 +3,7 @@ const { pool } = require('../config/database');
 
 class MessagingService {
   constructor() {
-    // Initialize SendGrid
+    // Initialize SendGrid for email-only CRM
     if (process.env.SENDGRID_API_KEY) {
       sgMail.setApiKey(process.env.SENDGRID_API_KEY);
       this.emailEnabled = true;
@@ -11,26 +11,6 @@ class MessagingService {
     } else {
       this.emailEnabled = false;
       console.log('⚠️  SendGrid not configured - email sending disabled');
-    }
-
-    // Initialize Twilio
-    if (process.env.TWILIO_ACCOUNT_SID && process.env.TWILIO_AUTH_TOKEN && process.env.TWILIO_PHONE_NUMBER) {
-      try {
-        const twilio = require('twilio');
-        this.twilioClient = twilio(
-          process.env.TWILIO_ACCOUNT_SID,
-          process.env.TWILIO_AUTH_TOKEN
-        );
-        this.smsEnabled = true;
-        this.twilioPhoneNumber = process.env.TWILIO_PHONE_NUMBER;
-        console.log('✅ Twilio SMS service initialized');
-      } catch (error) {
-        this.smsEnabled = false;
-        console.log('⚠️  Twilio configuration error - SMS sending disabled:', error.message);
-      }
-    } else {
-      this.smsEnabled = false;
-      console.log('⚠️  Twilio not configured - SMS sending disabled');
     }
   }
 
@@ -82,48 +62,6 @@ class MessagingService {
   }
 
   /**
-   * Send an SMS using Twilio
-   */
-  async sendSMS(messageData) {
-    if (!this.smsEnabled) {
-      throw new Error('SMS service not configured');
-    }
-
-    if (!this.twilioPhoneNumber) {
-      throw new Error('Twilio phone number not configured');
-    }
-
-    const { to, body, messageId } = messageData;
-
-    try {
-      console.log(`📱 Sending SMS to ${to}: "${body.substring(0, 50)}..."`);
-      
-      const message = await this.twilioClient.messages.create({
-        body: body,
-        from: this.twilioPhoneNumber,
-        to: to
-      });
-
-      return {
-        success: true,
-        providerMessageId: message.sid,
-        status: 'sent',
-        sentAt: new Date().toISOString()
-      };
-
-    } catch (error) {
-      console.error('❌ SMS sending failed:', error.message);
-      
-      return {
-        success: false,
-        status: 'failed',
-        errorMessage: error.message,
-        sentAt: new Date().toISOString()
-      };
-    }
-  }
-
-  /**
    * Process pending messages and send them
    */
   async processPendingMessages() {
@@ -132,12 +70,12 @@ class MessagingService {
     try {
       console.log('🔄 Processing pending messages...');
       
-      // Get all pending messages
+      // Get all pending email messages
       const result = await client.query(`
-        SELECT mh.*, c.first_name, c.last_name, c.email, c.phone
+        SELECT mh.*, c.first_name, c.last_name, c.email
         FROM message_history mh
         JOIN contacts c ON mh.contact_id = c.id
-        WHERE mh.status = 'pending'
+        WHERE mh.status = 'pending' AND mh.type = 'email'
         ORDER BY mh.created_at ASC
         LIMIT 50
       `);
@@ -155,32 +93,16 @@ class MessagingService {
       // Process each message
       for (const message of pendingMessages) {
         try {
-          let sendResult;
-          
-          if (message.type === 'email') {
-            if (!message.recipient_email) {
-              throw new Error('No email address available');
-            }
-            
-            sendResult = await this.sendEmail({
-              to: message.recipient_email,
-              subject: message.subject,
-              body: message.body,
-              messageId: message.id
-            });
-          } else if (message.type === 'sms') {
-            if (!message.recipient_phone) {
-              throw new Error('No phone number available');
-            }
-            
-            sendResult = await this.sendSMS({
-              to: message.recipient_phone,
-              body: message.body,
-              messageId: message.id
-            });
-          } else {
-            throw new Error(`Unknown message type: ${message.type}`);
+          if (!message.recipient_email) {
+            throw new Error('No email address available');
           }
+          
+          const sendResult = await this.sendEmail({
+            to: message.recipient_email,
+            subject: message.subject,
+            body: message.body,
+            messageId: message.id
+          });
 
           // Update message status in database
           await client.query(`
@@ -329,11 +251,6 @@ class MessagingService {
       email: {
         enabled: this.emailEnabled,
         provider: 'SendGrid'
-      },
-      sms: {
-        enabled: this.smsEnabled,
-        provider: 'Twilio',
-        phoneNumber: this.twilioPhoneNumber
       }
     };
   }

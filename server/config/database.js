@@ -73,29 +73,30 @@ const initializeDatabase = async () => {
       ADD COLUMN IF NOT EXISTS last_contact_date TIMESTAMP
     `);
 
-    // Message templates table
+    // Message templates table (email only)
     await pool.query(`
       CREATE TABLE IF NOT EXISTS message_templates (
         id SERIAL PRIMARY KEY,
         user_id INTEGER REFERENCES users(id) ON DELETE CASCADE,
         name VARCHAR(255) NOT NULL,
-        subject VARCHAR(500),
+        subject VARCHAR(500) NOT NULL,
         body TEXT NOT NULL,
-        type VARCHAR(50) NOT NULL, -- 'email' or 'sms'
+        type VARCHAR(50) DEFAULT 'email', -- 'email' only (SMS removed)
+        category VARCHAR(100), -- 'promotional', 'transactional', 'newsletter', etc.
         variables TEXT[], -- Dynamic variables like {first_name}, {company}
         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
         updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
       )
     `);
 
-    // Message campaigns table
+    // Message campaigns table (email only)
     await pool.query(`
       CREATE TABLE IF NOT EXISTS message_campaigns (
         id SERIAL PRIMARY KEY,
         user_id INTEGER REFERENCES users(id) ON DELETE CASCADE,
         name VARCHAR(255) NOT NULL,
         template_id INTEGER REFERENCES message_templates(id) ON DELETE SET NULL,
-        type VARCHAR(50) NOT NULL, -- 'email' or 'sms'
+        type VARCHAR(50) DEFAULT 'email', -- 'email' only (SMS removed)
         status VARCHAR(50) DEFAULT 'draft', -- 'draft', 'sending', 'completed', 'failed'
         total_recipients INTEGER DEFAULT 0,
         sent_count INTEGER DEFAULT 0,
@@ -108,7 +109,7 @@ const initializeDatabase = async () => {
       )
     `);
 
-    // Message history table (individual messages)
+    // Message history table (email messages only)
     await pool.query(`
       CREATE TABLE IF NOT EXISTS message_history (
         id SERIAL PRIMARY KEY,
@@ -116,13 +117,12 @@ const initializeDatabase = async () => {
         user_id INTEGER REFERENCES users(id) ON DELETE CASCADE,
         contact_id INTEGER REFERENCES contacts(id) ON DELETE CASCADE,
         template_id INTEGER REFERENCES message_templates(id) ON DELETE SET NULL,
-        type VARCHAR(50) NOT NULL, -- 'email' or 'sms'
-        subject VARCHAR(500), -- for emails
+        type VARCHAR(50) DEFAULT 'email', -- 'email' only (SMS removed)
+        subject VARCHAR(500) NOT NULL,
         body TEXT NOT NULL,
-        recipient_email VARCHAR(255),
-        recipient_phone VARCHAR(50),
+        recipient_email VARCHAR(255) NOT NULL,
         status VARCHAR(50) DEFAULT 'pending', -- 'pending', 'sent', 'delivered', 'failed', 'bounced'
-        provider_message_id VARCHAR(255), -- ID from email/SMS provider
+        provider_message_id VARCHAR(255), -- ID from SendGrid
         error_message TEXT,
         sent_at TIMESTAMP,
         delivered_at TIMESTAMP,

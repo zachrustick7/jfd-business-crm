@@ -5,13 +5,12 @@ import { Input } from '../../components/ui/input';
 import { MessageTemplate, TemplateFormData, TemplatePreview } from '../../types';
 
 import axios from 'axios';
-import { Plus, Search, Edit2, Trash2, Eye, Mail, MessageSquare, FileText, Tag } from 'lucide-react';
+import { Plus, Search, Edit2, Trash2, Eye, Mail, FileText, Tag } from 'lucide-react';
 
 const TemplatesPage: React.FC = () => {
   const [templates, setTemplates] = useState<MessageTemplate[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
-  const [typeFilter, setTypeFilter] = useState<'all' | 'email' | 'sms'>('all');
   const [showAddForm, setShowAddForm] = useState(false);
   const [editingTemplate, setEditingTemplate] = useState<MessageTemplate | null>(null);
   const [formData, setFormData] = useState<TemplateFormData>({
@@ -25,13 +24,11 @@ const TemplatesPage: React.FC = () => {
   const [showPreview, setShowPreview] = useState(false);
   const [previewData, setPreviewData] = useState<TemplatePreview | null>(null);
 
-  // Fetch templates
+  // Fetch templates (email only)
   const fetchTemplates = async () => {
     try {
       const params = new URLSearchParams();
-      if (typeFilter !== 'all') {
-        params.append('type', typeFilter);
-      }
+      params.append('type', 'email'); // Always fetch email templates only
       if (searchTerm) {
         params.append('search', searchTerm);
       }
@@ -49,21 +46,19 @@ const TemplatesPage: React.FC = () => {
 
   useEffect(() => {
     fetchTemplates();
-  }, [typeFilter, searchTerm]);
+  }, [searchTerm]);
 
-  // Filter templates based on search and type
+  // Filter templates based on search only (no type filter needed)
   const filteredTemplates = Array.isArray(templates) ? templates.filter(template => {
     const matchesSearch = template.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
                          (template.subject && template.subject.toLowerCase().includes(searchTerm.toLowerCase())) ||
                          template.body.toLowerCase().includes(searchTerm.toLowerCase()) ||
                          (template.category && template.category.toLowerCase().includes(searchTerm.toLowerCase()));
     
-    const matchesType = typeFilter === 'all' || template.type === typeFilter;
-    
-    return matchesSearch && matchesType;
+    return matchesSearch;
   }) : [];
 
-  // Handle form submission
+  // Handle form submission (email only)
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setFormLoading(true);
@@ -71,9 +66,9 @@ const TemplatesPage: React.FC = () => {
     try {
       const templateData = {
         name: formData.name,
-        subject: formData.type === 'email' ? formData.subject : undefined,
+        subject: formData.subject, // Always required for email
         body: formData.body,
-        type: formData.type,
+        type: 'email', // Always email
         category: formData.category || undefined
       };
 
