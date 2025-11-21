@@ -17,9 +17,6 @@ Get a shareable link to your stakeholder in 15-20 minutes!
 JWT_SECRET=jfd-crm-production-secret-2024-abc123
 SENDGRID_API_KEY=(leave blank for now - stakeholder will provide)
 SENDGRID_FROM_EMAIL=(leave blank for now)
-TWILIO_ACCOUNT_SID=
-TWILIO_AUTH_TOKEN=
-TWILIO_PHONE_NUMBER=
 NODE_ENV=production
 PORT=5001
 ```

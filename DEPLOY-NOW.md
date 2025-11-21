@@ -49,9 +49,6 @@ git push origin main
 JWT_SECRET=jfd-crm-super-secret-key-production-2024-change-this
 SENDGRID_API_KEY=your-sendgrid-api-key-here
 SENDGRID_FROM_EMAIL=noreply@yourdomain.com
-TWILIO_ACCOUNT_SID=
-TWILIO_AUTH_TOKEN=
-TWILIO_PHONE_NUMBER=
 NODE_ENV=production
 PORT=5001
 ```
