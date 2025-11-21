@@ -6,7 +6,7 @@ import Layout from './components/Layout/Layout';
 import LoginPage from './pages/Auth/LoginPage';
 import DashboardPage from './pages/Dashboard/DashboardPage';
 import ContactsPage from './pages/Contacts/ContactsPage';
-import MessagingPage from './pages/Messaging/MessagingPage';
+import SendMessagePage from './pages/SendMessage/SendMessagePage';
 import TemplatesPage from './pages/Templates/TemplatesPage';
 import MessageHistoryPage from './pages/MessageHistory/MessageHistoryPage';
 import LoadingSpinner from './components/Common/LoadingSpinner';
@@ -33,7 +33,7 @@ function App() {
         <Route path="/" element={<Navigate to="/dashboard" replace />} />
         <Route path="/dashboard" element={<DashboardPage />} />
         <Route path="/contacts" element={<ContactsPage />} />
-        <Route path="/messaging" element={<MessagingPage />} />
+        <Route path="/send-message" element={<SendMessagePage />} />
         <Route path="/templates" element={<TemplatesPage />} />
         <Route path="/message-history" element={<MessageHistoryPage />} />
         <Route path="*" element={<Navigate to="/dashboard" replace />} />

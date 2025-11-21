@@ -6,7 +6,7 @@ import { Input } from '../ui/input';
 import { 
   BarChart3, 
   Users, 
-  MessageSquare, 
+  Send,
   FileText, 
   Clock,
   Settings,
@@ -30,7 +30,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
   const navigation = [
     { name: 'Dashboard', href: '/dashboard', icon: BarChart3 },
     { name: 'Contacts', href: '/contacts', icon: Users },
-    { name: 'Messaging', href: '/messaging', icon: MessageSquare },
+    { name: 'Send Message', href: '/send-message', icon: Send },
     { name: 'Templates', href: '/templates', icon: FileText },
     { name: 'Message History', href: '/message-history', icon: Clock },
     { name: 'Settings', href: '/settings', icon: Settings },
